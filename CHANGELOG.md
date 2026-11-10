@@ -17,7 +17,9 @@ First public release of ReadyLine by Makersridge.
 - Google Sheet records: Summary (one row per person), Results (every attempt), Registrations, Overrides
 - ReadyLine menu in the Sheet: Look up a person (status, results, and their personal link to copy) and Refresh summary
 - Quiz spreadsheet templates and tools/quiz-to-settings.js
-- Demo mode with sample sessions, videos, and captions
+- Demo mode with sample sessions, videos, and captions, live at https://a-makersridge.github.io/readyline-training/site/
+  - Any access code, name, and email work (the code comes filled in), and nothing is saved or emailed
+  - A "Skip the video" button so visitors can flip through every screen. It appears only in demo mode.
 
 **Docs**
 - Setup guide with an AI prompt at every step, and a starter prompt for any AI assistant

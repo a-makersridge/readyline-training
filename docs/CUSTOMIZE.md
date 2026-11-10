@@ -105,6 +105,8 @@ The "Choose brand colors" prompt in [AI-PROMPTS.md](AI-PROMPTS.md) picks shades 
 
 ## Demo mode
 
-With `SCRIPT_URL` left empty, the page runs on its own with the sample sessions from `site/demo.js`. Nothing is saved or emailed. It's handy for showing the tool to your team before setup.
+With `SCRIPT_URL` left empty, the page runs on its own with the sample sessions from `site/demo.js`. Nothing is saved or emailed. It's handy for showing the tool to your team before setup. The public demo is at [a-makersridge.github.io/readyline-training/site/](https://a-makersridge.github.io/readyline-training/site/).
+
+In demo mode, any access code, name, and email work (the code field comes filled in with DEMO), and each video has a **Skip the video** button so people can see every screen in a few minutes. Neither appears once `SCRIPT_URL` is set: on a live site, the code is checked and the videos can't be skipped.
 
 `tools/build-demo.js` rebuilds `demo.js` from the sample settings in Code.gs. It refuses to run once Code.gs has your real settings, because demo.js shows answers in plain view. Don't upload demo.js to your live site.
