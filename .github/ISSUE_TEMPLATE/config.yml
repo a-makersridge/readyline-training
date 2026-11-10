@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Setup guide
+    url: https://github.com/a-makersridge/readyline-training/blob/main/docs/SETUP.md
+    about: Step-by-step setup, with an AI prompt at every step.
+  - name: Troubleshooting
+    url: https://github.com/a-makersridge/readyline-training/blob/main/docs/ADMIN-GUIDE.md#troubleshooting
+    about: Common errors and fixes.
+  - name: Report a security problem privately
+    url: https://github.com/a-makersridge/readyline-training/security/advisories/new
+    about: Please don't post security problems in a public issue.

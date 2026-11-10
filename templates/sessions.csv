@@ -1,0 +1,4 @@
+﻿session_id,version,title_en,title_es,minutes_en,minutes_es,video_en,video_es,captions_en,captions_es
+session-1,v1,Welcome to the team,Bienvenido al equipo,1,1,session-1-en.mp4,session-1-es.mp4,session-1-en.vtt,session-1-es.vtt
+session-2,v1,Safety on the floor,Seguridad en el área de trabajo,1,1,session-2-en.mp4,session-2-es.mp4,session-2-en.vtt,session-2-es.vtt
+session-3,v1,Getting help,Cómo pedir ayuda,1,1,session-3-en.mp4,session-3-es.mp4,session-3-en.vtt,session-3-es.vtt

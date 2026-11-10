@@ -1,0 +1,11 @@
+name: Idea
+description: Suggest a feature or an improvement to the docs
+labels: ["idea"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would you like ReadyLine to do?
+      description: Tell us the problem it would solve for your team.
+    validations:
+      required: true

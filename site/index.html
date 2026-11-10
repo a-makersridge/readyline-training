@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<!-- ReadyLine by Makersridge 1.0.0. https://github.com/a-makersridge/readyline-training -->
+<!-- Security rule: only these sites may load anything into this page. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src https://script.google.com https://script.googleusercontent.com; media-src 'self' blob: https://*.r2.cloudflarestorage.com; frame-src https://challenges.cloudflare.com; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex">
+<title>Training</title>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  /* Colors. YOUR SETTINGS (below, in the script) set --brand and --accent. */
+  :root{
+    --brand:#1F2328; --accent:#2F855A;
+    --page:#FFFFFF; --ink:#1F2328; --soft:#59636E; --tint:#F3F4F6; --tint-2:#E5E7EB;
+    --primary:var(--brand); --on-primary:#fff; --danger:#B42318; --danger-tint:#FDECEA; --good-tint:#E8F3EC;
+    --accent-bright:color-mix(in srgb,var(--accent) 70%,#fff); --ok:var(--accent); --focus:#F2B705;
+    /* Header: white by default */
+    --band-bg:var(--page); --band-ink:var(--ink); --band-soft:var(--soft); --band-line:var(--tint-2);
+    --band-track:var(--tint-2); --band-current:var(--brand); --band-current-ink:#fff; --band-done:var(--ok); --band-done-ink:#fff;
+    --video-wait:#2A2F35;
+  }
+  :root[data-header="brand"]{
+    --band-bg:var(--brand); --band-ink:#fff; --band-soft:rgba(255,255,255,.75); --band-line:transparent;
+    --band-track:rgba(255,255,255,.18); --band-current:#fff; --band-current-ink:var(--brand); --band-done:var(--accent-bright); --band-done-ink:var(--brand);
+    --video-wait:color-mix(in srgb,var(--brand) 88%,#fff);
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --page:#111315; --ink:#EDEFF2; --soft:#A3ABB5; --tint:#1C1F23; --tint-2:#2C3036;
+      --primary:color-mix(in srgb,var(--brand) 12%,#fff); --on-primary:#111315;
+      --danger:#F4A39A; --danger-tint:#3A1D1A; --good-tint:#16291E; --ok:var(--accent-bright);
+      --band-current:var(--primary); --band-current-ink:#111315; --band-done-ink:#111315;
+    }
+    :root[data-header="brand"]{ --band-current:#fff; --band-current-ink:var(--brand); }
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--page);color:var(--ink);font:18px/1.55 "Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif}
+  #app{min-height:100vh;display:flex;flex-direction:column}
+  .in{max-width:600px;margin:0 auto;padding:0 20px}
+
+  /* Top band */
+  .band{background:var(--band-bg);color:var(--band-ink);padding:22px 0 30px;border-bottom:1px solid var(--band-line)}
+  .course{margin:0 0 18px;font-size:15px;color:var(--band-soft)}
+  .band h1{font-size:32px;line-height:1.12;letter-spacing:-.01em;margin:22px 0 0;font-weight:700;text-wrap:balance}
+  .lede{margin:10px 0 0;color:var(--band-soft);font-size:18px;max-width:34em}
+
+  /* Progress rail */
+  .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin:0;padding:0;list-style:none}
+  .stp{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:8px;width:100%;padding:12px 0 2px;position:relative;font-size:15px;color:var(--band-soft);cursor:default}
+  .stp::before{content:"";position:absolute;top:0;left:0;right:0;height:6px;border-radius:3px;background:var(--band-track)}
+  .stp .dot{flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;border:1.5px solid var(--band-soft)}
+  .stp.current{color:var(--band-ink);font-weight:700}
+  .stp.current::before{background:var(--band-current)}
+  .stp.current .dot{background:var(--band-current);color:var(--band-current-ink);border-color:var(--band-current)}
+  .stp.done{color:var(--band-done)}
+  .stp.done::before{background:var(--band-done)}
+  .stp.done .dot{background:var(--band-done);border-color:var(--band-done);color:var(--band-done-ink)}
+  .stp.done.current{color:var(--band-ink)}
+  button.stp.clickable{cursor:pointer}
+  button.stp.clickable:hover span:last-of-type{text-decoration:underline;text-underline-offset:3px}
+  .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  /* Content */
+  .wrap{flex:1;padding:28px 0 24px}
+  h2{font-size:22px;line-height:1.25;margin:0 0 8px}
+  p{margin:0 0 16px}
+  .soft{color:var(--soft)}
+  .small{font-size:15px}
+  a{color:inherit;text-underline-offset:3px;overflow-wrap:anywhere}
+
+  /* Buttons */
+  button{font:inherit}
+  .btn{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;padding:14px 20px;border:0;border-radius:14px;background:var(--primary);color:var(--on-primary);font-weight:700;font-size:18px;cursor:pointer;transition:transform .08s}
+  .btn:active{transform:scale(.985)}
+  .btn.quiet{background:var(--tint);color:var(--ink)}
+  .btn:disabled{opacity:.6;cursor:wait}
+  .btn + .btn{margin-top:10px}
+  :focus-visible{outline:3px solid var(--focus);outline-offset:2px;border-radius:6px}
+
+  /* Pinned action area */
+  .actions{position:sticky;bottom:0;background:var(--page);padding:14px 0 calc(14px + env(safe-area-inset-bottom));border-top:1px solid var(--tint-2)}
+
+  /* Language choice */
+  .langs{display:grid;gap:12px}
+  .lang{all:unset;box-sizing:border-box;display:block;width:100%;padding:20px 22px;border-radius:16px;background:var(--tint);cursor:pointer}
+  .lang strong{display:block;font-size:24px;line-height:1.2}
+  .lang span{color:var(--soft);font-size:16px}
+  .lang:hover{background:var(--tint-2)}
+
+  /* Form */
+  .field{display:block;font-weight:700;font-size:16px;margin:0 0 6px}
+  .input{display:block;width:100%;font:inherit;font-size:18px;padding:14px 16px;border:2px solid transparent;border-radius:12px;background:var(--tint);color:var(--ink);margin:0 0 18px}
+  .input:focus{outline:none;border-color:var(--primary);background:var(--page)}
+  .hint{margin:-12px 0 18px;font-size:15px;color:var(--soft)}
+  .error{color:var(--danger);font-size:16px;margin:0 0 12px}
+  .error:empty{display:none}
+  .human{margin:0 0 12px;min-height:0}
+
+  /* Video */
+  .video-wrap{position:relative;background:#000;border-radius:16px;overflow:hidden;margin:4px 0 14px;aspect-ratio:16/9}
+  video{display:block;width:100%;height:100%;background:#000;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  .shield{position:absolute;inset:0}
+  .loading{display:grid;place-items:center;aspect-ratio:16/9;background:var(--video-wait);color:rgba(255,255,255,.8);border-radius:16px;margin:4px 0 14px;font-size:16px}
+  .bar{height:6px;background:var(--tint-2);border-radius:3px;overflow:hidden;margin-bottom:8px}
+  .fill{height:100%;width:0;background:var(--ok);transition:width .3s linear}
+  .row{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:15px;color:var(--soft);font-variant-numeric:tabular-nums;margin-bottom:18px}
+  .cc{font:inherit;font-size:14px;font-weight:700;padding:4px 12px;border-radius:999px;border:1.5px solid var(--soft);background:transparent;color:var(--soft);cursor:pointer}
+  .cc[aria-pressed="true"]{background:var(--primary);border-color:var(--primary);color:var(--on-primary)}
+  video::cue{font-size:clamp(14px,3.8vw,22px);line-height:1.35;background:rgba(0,0,0,.78)}
+  @media (max-width:600px){ .video-wrap,.loading{margin-left:-20px;margin-right:-20px;border-radius:0} }
+
+  /* Quiz */
+  .q{border:0;margin:0 0 34px;padding:0;min-width:0}
+  .q legend{padding:0;margin:0 0 14px;font-size:20px;font-weight:700;line-height:1.35;float:left;width:100%}
+  .q legend + *{clear:both}
+  .q .num{display:block;font-size:15px;font-weight:400;color:var(--soft);margin-bottom:4px}
+  .opt{display:flex;gap:14px;align-items:flex-start;padding:15px 16px;border-radius:12px;background:var(--tint);cursor:pointer;margin-bottom:8px;font-size:18px;line-height:1.4}
+  .opt input{appearance:none;-webkit-appearance:none;flex:none;width:22px;height:22px;margin:1px 0 0;border-radius:50%;border:2px solid var(--soft);background:var(--page);display:grid;place-items:center;cursor:pointer}
+  .opt input::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--primary);transform:scale(0);transition:transform .12s}
+  .opt input:checked{border-color:var(--on-primary)}
+  .opt input:checked::after{transform:scale(1)}
+  .opt:has(input:checked){background:var(--primary);color:var(--on-primary)}
+  .opt:hover{background:var(--tint-2)}
+  .opt:has(input:checked):hover{filter:brightness(1.08)}
+  .opt:has(input:focus-visible){outline:3px solid var(--focus);outline-offset:2px}
+
+  /* Result */
+  .result{display:flex;align-items:center;gap:18px;padding:22px 0 26px}
+  .badge{flex:none;width:76px;height:76px;border-radius:50%;display:grid;place-items:center}
+  .result.pass .badge{background:var(--ok)}
+  .result.fail .badge{background:var(--danger-tint);color:var(--danger)}
+  .badge svg{width:40px;height:40px}
+  .badge .tick{fill:none;stroke:#fff;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:0;animation:draw .5s .15s ease-out both}
+  @media (prefers-color-scheme:dark){ .badge .tick{stroke:#111315} }
+  @keyframes draw{from{stroke-dashoffset:40}}
+  @media (prefers-reduced-motion:reduce){ .badge .tick{animation:none} .btn{transition:none} .opt input::after{transition:none} }
+  .big{font-size:44px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums}
+  .who{color:var(--soft);font-size:16px;margin-top:6px}
+  .done-note{background:var(--good-tint);border-radius:12px;padding:16px 18px;margin:0}
+  [hidden]{display:none!important}
+  .demo{margin:0;padding:8px 20px;background:#F2B705;color:#1A1A1A;font-size:14px;text-align:center}
+</style>
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+
+<script>
+/* ============================ YOUR SETTINGS ============================
+   Edit this block, then upload the site again. Full guide: docs/CUSTOMIZE.md
+   Sessions, questions, and answers live in the Google script (Code.gs), not here.
+   Leave SCRIPT_URL empty to run the page in demo mode with the sample sessions. */
+const CONFIG = {
+  // Your Apps Script web app address, ending in /exec. Empty = demo mode.
+  SCRIPT_URL: "",
+  // Your Cloudflare Turnstile site key. It's public, so it's safe here.
+  TURNSTILE_SITE_KEY: "",
+  // Must match TRAINING_NAME and LANGUAGES in Code.gs.
+  TRAINING_NAME: { en: "Sample Company Training", es: "Capacitación de Sample Company" },
+  LANGUAGES: ["en", "es"],
+  // Your organization's name, as people know it.
+  ORGANIZATION: "Sample Company",
+  // Who people should contact for help. Shown when someone runs out of attempts.
+  CONTACTS: [{ name: "Jordan", email: "jordan@example.com" }],
+  // Look. The default is a plain white page with charcoal buttons.
+  //   BRAND_COLOR: buttons and selected answers. White text sits on it, so pick a dark shade.
+  //   ACCENT_COLOR: progress bars, finished steps, and pass marks.
+  //   HEADER_STYLE: set to "white" for a white header, or "brand" for a header filled with BRAND_COLOR.
+  BRAND_COLOR: "#1F2328",
+  ACCENT_COLOR: "#2F855A",
+  HEADER_STYLE: "white"
+};
+/* ======================= END OF YOUR SETTINGS ======================= */
+
+const DEMO = !CONFIG.SCRIPT_URL;
+
+const TEXT = {
+  en: {
+    title: "{t}",
+    sessionTitle: "{t}, Session {s} of {n}", sessionTitle1: "{t}",
+    progress: "Sessions completed: {d} of {n}",
+    regIntro: "Register to get your personal training link. We'll email it to you.",
+    first: "First name", last: "Last name", email: "Email", code: "Access code",
+    codeHint: "{o} gave you this code.",
+    register: "Send my link", registering: "Sending…",
+    regErr: "Fill in every field to continue.",
+    bad_code: "That access code isn't right. Check with {o} and try again.",
+    bad_email: "Enter a valid email address.",
+    missing_name: "Enter your first and last name.",
+    bad_name: "Use letters only in your name. Hyphens, apostrophes, and spaces are fine.",
+    bot_check: "We couldn't confirm you're not a bot. Wait a moment and try again.",
+    humanWait: "Checking your connection. Try again in a few seconds.",
+    busy: "Registration is busy right now. Try again in an hour.",
+    bad_request: "Something went wrong. Refresh the page and try again.",
+    regFail: "We couldn't register you. Check your connection and try again.",
+    checkTitle: "Check your email",
+    checkMsg: "We sent your personal training link to {e}. Open it on the device you'll use for the training.",
+    checkNote: "Didn't get it? It can take a few minutes. Search your email for \"{t}\" and check your Spam, Junk, and Promotions folders. If it's there, mark it as not spam. Still missing? Use \"Already registered?\" on the training page to send it again.",
+    haveLink: "Already registered? Get your link again",
+    resendTitle: "Get your link again",
+    resendIntro: "Enter the email you registered with. We'll send your personal link again, and you'll pick up where you left off.",
+    resendBtn: "Resend my link",
+    backToReg: "New here? Register instead",
+    resendSentTitle: "Check your email",
+    resendSentMsg: "If {e} is registered, we just sent your link to it.",
+    resendSentNote: "Search your email for \"{t}\" and check your Spam, Junk, and Promotions folders too. If nothing arrives in a few minutes, you may have registered with a different email, or not registered yet. You can register here. {c}",
+    resendFail: "We couldn't send your link. Check your connection and try again.",
+    loading: "Loading your training…",
+    badLinkTitle: "This link isn't working",
+    badLinkMsg: "Your training link may be incomplete or out of date. We can email you a new copy.",
+    registerAgain: "Get my link again",
+    welcome: "Welcome, {n}",
+    welcomeMsg: "Session {s}, {st}, has a {m}-minute video, then a quiz. You need {p}% to pass, and you have {a} attempts at the quiz.",
+    welcomeMsg1: "This training has a {m}-minute video, then a quiz. You need {p}% to pass, and you have {a} attempts at the quiz.",
+    welcomeBack: "Welcome back, {n}",
+    beginSession: "Start Session {s}",
+    begin: "Start the training",
+    notYou: "Not you? Register with your own information.",
+    stepStart: "Start", stepVideo: "Video", stepQuiz: "Quiz",
+    qOf: "Question {i} of {n}", regTitle: "Get your training link", loadingTitle: "One moment",
+    sendErrTitle: "Your answers weren't saved",
+    stepDone: "completed", stepCurrent: "current step", stepLocked: "locked",
+    loadingVideo: "Loading your video…",
+    startTitle: "Before you begin",
+    watchTitle: "Watch the full video",
+    watchNote: "The video can't be skipped or sped up. If you pause or leave, it picks up where you stopped, even if you come back later with the same link.",
+    play: "Play video", pause: "Pause", resume: "Resume video", captions: "Captions",
+    watched: "watched", left: "left",
+    leftPage: "The video paused because you left this page. Press resume to continue.",
+    toQuiz: "Take the quiz", quizTitle: "Quiz",
+    quizNote: "Answer every question. You need {p}% to pass. You have {r} of {a} attempts left.",
+    quizLast: "Answer every question. You need {p}% to pass. This is your last attempt.",
+    submit: "Submit answers", quizErr: "Answer every question before submitting.",
+    sending: "Saving your answers…",
+    passTitle: "You passed", failTitle: "Not quite",
+    passMsg: "Session {s} is complete and recorded. Session {x} is now open.",
+    passFinal: "You've completed all {n} sessions of {t}. Your results are recorded. You can close this page.",
+    passFinal1: "You've completed {t}. Your result is recorded. You can close this page.",
+    nextSession: "Start Session {x}",
+    failMsg: "You need {p}% to pass. Your attempt has been recorded, and you have {r} {w} left. Watch the full video again to open the quiz.",
+    attemptOne: "attempt", attemptMany: "attempts",
+    review: "Watch the video again",
+    lockedTitle: "You've used all your attempts",
+    lockedMsg: "Your results have been recorded. {c}",
+    completeTitle: "You've completed {t}",
+    completeMsg: "All {n} sessions are passed and recorded. There's nothing else you need to do.",
+    completeMsg1: "Your training is passed and recorded. There's nothing else you need to do.",
+    sendErr: "We couldn't save your answers. Check your connection and try again.",
+    retry: "Try again", attempt: "Attempt",
+    videoErr: "The video couldn't load. Check your connection and refresh the page.",
+    contact: "Contact {list} for help.", or: "or",
+    demoNote: "Demo mode. Nothing is saved or emailed.",
+    demoOpen: "Open my training link (demo)"
+  },
+  es: {
+    title: "{t}",
+    sessionTitle: "{t}, Sesión {s} de {n}", sessionTitle1: "{t}",
+    progress: "Sesiones completadas: {d} de {n}",
+    regIntro: "Regístrese para recibir su enlace personal de capacitación. Se lo enviaremos por correo electrónico.",
+    first: "Nombre", last: "Apellido", email: "Correo electrónico", code: "Código de acceso",
+    codeHint: "{o} le dio este código.",
+    register: "Enviar mi enlace", registering: "Enviando…",
+    regErr: "Llene todos los campos para continuar.",
+    bad_code: "Ese código de acceso no es correcto. Consulte con {o} e inténtelo de nuevo.",
+    bad_email: "Escriba un correo electrónico válido.",
+    missing_name: "Escriba su nombre y apellido.",
+    bad_name: "Use solo letras en su nombre. Se permiten guiones, apóstrofos y espacios.",
+    bot_check: "No pudimos confirmar que no es un robot. Espere un momento e inténtelo de nuevo.",
+    humanWait: "Verificando su conexión. Inténtelo de nuevo en unos segundos.",
+    busy: "El registro está ocupado en este momento. Inténtelo de nuevo en una hora.",
+    bad_request: "Algo salió mal. Actualice la página e inténtelo de nuevo.",
+    regFail: "No pudimos registrarlo. Revise su conexión e inténtelo de nuevo.",
+    checkTitle: "Revise su correo electrónico",
+    checkMsg: "Enviamos su enlace personal de capacitación a {e}. Ábralo en el dispositivo que usará para la capacitación.",
+    checkNote: "¿No lo recibió? Puede tardar unos minutos. Busque \"{t}\" en su correo y revise las carpetas de spam, correo no deseado y promociones. Si está ahí, márquelo como que no es spam. ¿Todavía no aparece? Use \"¿Ya se registró?\" en la página de capacitación para recibirlo otra vez.",
+    haveLink: "¿Ya se registró? Reciba su enlace otra vez",
+    resendTitle: "Reciba su enlace otra vez",
+    resendIntro: "Escriba el correo electrónico con el que se registró. Le enviaremos su enlace personal otra vez y continuará donde se quedó.",
+    resendBtn: "Reenviar mi enlace",
+    backToReg: "¿Es nuevo? Regístrese aquí",
+    resendSentTitle: "Revise su correo electrónico",
+    resendSentMsg: "Si {e} está registrado, le acabamos de enviar su enlace.",
+    resendSentNote: "Busque \"{t}\" en su correo y revise también las carpetas de spam, correo no deseado y promociones. Si no llega nada en unos minutos, es posible que se haya registrado con otro correo o que todavía no se haya registrado. Puede registrarse aquí. {c}",
+    resendFail: "No pudimos enviar su enlace. Revise su conexión e inténtelo de nuevo.",
+    loading: "Cargando su capacitación…",
+    badLinkTitle: "Este enlace no funciona",
+    badLinkMsg: "Su enlace puede estar incompleto o vencido. Podemos enviarle una copia nueva por correo.",
+    registerAgain: "Recibir mi enlace otra vez",
+    welcome: "Bienvenido(a), {n}",
+    welcomeMsg: "La sesión {s}, {st}, tiene un video de {m} minutos y luego un examen. Necesita {p}% para aprobar y tiene {a} intentos para el examen.",
+    welcomeMsg1: "Esta capacitación tiene un video de {m} minutos y luego un examen. Necesita {p}% para aprobar y tiene {a} intentos para el examen.",
+    welcomeBack: "Bienvenido(a) de nuevo, {n}",
+    beginSession: "Comenzar la sesión {s}",
+    begin: "Comenzar la capacitación",
+    notYou: "¿No es usted? Regístrese con su propia información.",
+    stepStart: "Inicio", stepVideo: "Video", stepQuiz: "Examen",
+    qOf: "Pregunta {i} de {n}", regTitle: "Reciba su enlace de capacitación", loadingTitle: "Un momento",
+    sendErrTitle: "Sus respuestas no se guardaron",
+    stepDone: "completado", stepCurrent: "paso actual", stepLocked: "bloqueado",
+    loadingVideo: "Cargando su video…",
+    startTitle: "Antes de comenzar",
+    watchTitle: "Vea el video completo",
+    watchNote: "El video no se puede adelantar ni acelerar. Si lo pausa o sale, continuará donde se quedó, aunque regrese más tarde con el mismo enlace.",
+    play: "Reproducir video", pause: "Pausar", resume: "Continuar video", captions: "Subtítulos",
+    watched: "visto", left: "restante",
+    leftPage: "El video se pausó porque salió de esta página. Presione continuar para seguir.",
+    toQuiz: "Hacer el examen", quizTitle: "Examen",
+    quizNote: "Conteste todas las preguntas. Necesita {p}% para aprobar. Le quedan {r} de {a} intentos.",
+    quizLast: "Conteste todas las preguntas. Necesita {p}% para aprobar. Este es su último intento.",
+    submit: "Enviar respuestas", quizErr: "Conteste todas las preguntas antes de enviar.",
+    sending: "Guardando sus respuestas…",
+    passTitle: "Aprobó", failTitle: "Todavía no",
+    passMsg: "La sesión {s} quedó completada y registrada. La sesión {x} ya está abierta.",
+    passFinal: "Completó las {n} sesiones de {t}. Sus resultados quedaron registrados. Puede cerrar esta página.",
+    passFinal1: "Completó {t}. Su resultado quedó registrado. Puede cerrar esta página.",
+    nextSession: "Comenzar la sesión {x}",
+    failMsg: "Necesita {p}% para aprobar. Su intento quedó registrado y le {q} {r} {w}. Vea el video completo otra vez para abrir el examen.",
+    attemptOne: "intento", attemptMany: "intentos",
+    review: "Ver el video otra vez",
+    lockedTitle: "Ya usó todos sus intentos",
+    lockedMsg: "Sus resultados quedaron registrados. {c}",
+    completeTitle: "Completó {t}",
+    completeMsg: "Las {n} sesiones están aprobadas y registradas. No necesita hacer nada más.",
+    completeMsg1: "Su capacitación está aprobada y registrada. No necesita hacer nada más.",
+    sendErr: "No pudimos guardar sus respuestas. Revise su conexión e inténtelo de nuevo.",
+    retry: "Intentar de nuevo", attempt: "Intento",
+    videoErr: "El video no pudo cargar. Revise su conexión y actualice la página.",
+    contact: "Comuníquese con {list} para recibir ayuda.", or: "o",
+    demoNote: "Modo de demostración. No se guarda ni se envía nada.",
+    demoOpen: "Abrir mi enlace de capacitación (demostración)"
+  }
+};
+
+const app = document.getElementById("app");
+const TOKEN = new URLSearchParams(location.search).get("t") || "";
+const state = { lang: null, first: "", last: "", idx: 0, sessions: [], passPercent: 100, statuses: null, status: null, started: false, videoStarted: "", videoFinished: "", maxWatched: 0, done: false, passed: false, lastAnswers: null, videoUrl: "", videoUrlAt: 0, videoTtl: 0, captionsSrc: "" };
+const contactHtml = () => {
+  const list = CONFIG.CONTACTS.map(c => esc(c.name) + ' (<a href="mailto:' + esc(c.email) + '">' + esc(c.email) + "</a>)");
+  const joined = list.length > 1 ? list.slice(0, -1).join(", ") + " " + TEXT[state.lang].or + " " + list.at(-1) : list.join("");
+  return TEXT[state.lang].contact.replace("{list}", joined);
+};
+const t = (k, vars) => {
+  const st = state.status || { allowed: 2, remaining: 2 };
+  const total = state.sessions.length;
+  const doneCount = state.statuses ? state.sessions.filter(x => state.statuses[x.id] && state.statuses[x.id].passed).length : 0;
+  const L = TEXT[state.lang];
+  const key = total === 1 && L[k + "1"] ? k + "1" : k;
+  const cur = state.sessions[state.idx];
+  let s = L[key].replace("{p}", state.passPercent).replace("{m}", cur ? cur.minutes : "")
+    .replace("{st}", cur ? esc(cur.title) : "")
+    .replace("{s}", state.idx + 1).replace("{x}", state.idx + 2).replace("{d}", doneCount)
+    .replace("{a}", st.allowed).replace("{r}", st.remaining)
+    .replace("{w}", st.remaining === 1 ? L.attemptOne : L.attemptMany)
+    .replace("{q}", st.remaining === 1 ? "queda" : "quedan")
+    .replace("{t}", esc(CONFIG.TRAINING_NAME[state.lang] || "")).replace("{o}", esc(CONFIG.ORGANIZATION));
+  if (s.indexOf("{c}") !== -1) s = s.replace("{c}", contactHtml());
+  if (!vars || vars.n === undefined) s = s.split("{n}").join(total);
+  if (vars) Object.keys(vars).forEach(v => s = s.replace("{" + v + "}", vars[v]));
+  return s;
+};
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+const fmt = (s) => { s = Math.max(0, Math.floor(s)); return Math.floor(s/60) + ":" + String(s%60).padStart(2,"0"); };
+
+function setLang(lang) {
+  state.lang = lang;
+  document.documentElement.lang = lang;
+  document.title = CONFIG.TRAINING_NAME[lang] || "Training";
+}
+
+async function callScript(payload) {
+  if (DEMO) return window.ReadyLineDemo.call(payload);
+  const res = await fetch(CONFIG.SCRIPT_URL, {
+    method: "POST",
+    headers: { "Content-Type": "text/plain;charset=utf-8" },
+    body: JSON.stringify(payload)
+  });
+  return res.json();
+}
+
+// Video progress is kept on this device so a learner can come back later.
+const sess = () => state.sessions[state.idx];
+
+// Switch to a session: load its status and this device's saved progress for it.
+function setSession(idx) {
+  state.idx = idx;
+  state.status = state.statuses[sess().id];
+  if (state.captionsSrc.startsWith("blob:")) URL.revokeObjectURL(state.captionsSrc);
+  Object.assign(state, { started: false, done: false, maxWatched: 0, videoStarted: "", videoFinished: "", passed: false, lastAnswers: null, videoUrl: "", videoUrlAt: 0, videoTtl: 0, captionsSrc: "" });
+  loadProgress();
+  state.passed = state.status.passed;   // Google's record wins over this device's memory
+}
+
+const isLocked = () => !!state.status && !state.status.passed && state.status.remaining <= 0;
+const progressKey = () => "rl:" + sess().id + ":" + sess().version + ":" + TOKEN + ":" + state.lang;
+function saveProgress() {
+  try { localStorage.setItem(progressKey(), JSON.stringify({ st: state.started, m: state.maxWatched, d: state.done, s: state.videoStarted, f: state.videoFinished, p: state.passed })); } catch (e) {}
+}
+function loadProgress() {
+  try {
+    const p = JSON.parse(localStorage.getItem(progressKey()) || "null");
+    if (p) { state.started = !!p.st; state.maxWatched = p.m || 0; state.done = !!p.d; state.videoStarted = p.s || ""; state.videoFinished = p.f || ""; state.passed = !!p.p; }
+  } catch (e) {}
+}
+
+/* Screen: language (shown first when more than one language is offered) */
+const LANG_LABELS = { en: ["English", "Continue in English"], es: ["Español", "Continuar en español"] };
+function showLanguage() {
+  if (CONFIG.LANGUAGES.length === 1) { setLang(CONFIG.LANGUAGES[0]); return TOKEN ? showWelcome() : showRegister(); }
+  app.innerHTML = page({
+    course: CONFIG.LANGUAGES.map(l => esc(CONFIG.TRAINING_NAME[l])).join(" / "),
+    title: "Choose your language<br><span style=\"opacity:.7\">Elija su idioma</span>",
+    body: `
+      <div class="langs">
+        ${CONFIG.LANGUAGES.map(l => `<button class="lang" data-lang="${l}"><strong>${LANG_LABELS[l][0]}</strong><span>${LANG_LABELS[l][1]}</span></button>`).join("")}
+      </div>`
+  });
+  app.querySelectorAll("[data-lang]").forEach(b => b.onclick = () => {
+    setLang(b.dataset.lang);
+    TOKEN ? showWelcome() : showRegister();
+  });
+}
+
+/* Bot check (Cloudflare Turnstile). Usually invisible; asks for a click only if something looks off. */
+let humanToken = "", humanWidget = null;
+function renderHumanCheck(action, tries = 0) {
+  humanToken = "";
+  const el = app.querySelector("#human");
+  if (!el) return;
+  if (DEMO) { humanToken = "demo-" + action; return; }
+  if (!window.turnstile) {
+    if (tries < 50) setTimeout(() => renderHumanCheck(action, tries + 1), 200);
+    return;
+  }
+  humanWidget = window.turnstile.render(el, {
+    sitekey: CONFIG.TURNSTILE_SITE_KEY,
+    action: action,
+    language: state.lang,
+    appearance: "interaction-only",
+    callback: tok => { humanToken = tok; },
+    "expired-callback": () => { humanToken = ""; },
+    "error-callback": () => { humanToken = ""; }
+  });
+}
+function resetHumanCheck() {
+  humanToken = "";
+  if (window.turnstile && humanWidget !== null) window.turnstile.reset(humanWidget);
+}
+
+/* Screen: registration */
+function showRegister() {
+  app.innerHTML = page({
+    title: t("regTitle"),
+    lede: t("regIntro"),
+    body: `
+      <form id="reg" novalidate>
+        <label class="field" for="first">${t("first")}</label>
+        <input class="input" type="text" id="first" autocomplete="given-name" maxlength="40">
+        <label class="field" for="last">${t("last")}</label>
+        <input class="input" type="text" id="last" autocomplete="family-name" maxlength="40">
+        <label class="field" for="email">${t("email")}</label>
+        <input class="input" type="text" id="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="100">
+        <label class="field" for="code">${t("code")}</label>
+        <input class="input" type="text" id="code" autocapitalize="characters" autocomplete="off" maxlength="40">
+        <p class="hint">${t("codeHint")}</p>
+        <div id="human" class="human"></div>
+        <div class="actions"><p class="error" id="err"></p><button class="btn" type="submit" id="go">${t("register")}</button></div>
+      </form>
+      <p class="small soft" style="margin-top:18px"><a href="#" id="toResend">${t("haveLink")}</a></p>`
+  });
+  const form = app.querySelector("#reg");
+  const err = app.querySelector("#err");
+  const btn = app.querySelector("#go");
+  form.oninput = () => err.textContent = "";
+  app.querySelector("#toResend").onclick = (e) => { e.preventDefault(); showResend(); };
+  renderHumanCheck("register");
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const v = (id) => app.querySelector("#" + id).value.trim().replace(/\s+/g, " ");
+    const data = { action: "register", firstName: v("first"), lastName: v("last"), email: v("email"), code: v("code"), language: state.lang, human: humanToken };
+    if (!data.firstName || !data.lastName || !data.email || !data.code) { err.textContent = t("regErr"); return; }
+    const nameOk = n => /^[\p{L}\p{M}][\p{L}\p{M} .'\u2019-]{0,39}$/u.test(n) && !/\.\p{L}/u.test(n);
+    if (!nameOk(data.firstName) || !nameOk(data.lastName)) { err.textContent = t("bad_name"); return; }
+    if (!/^[A-Za-z0-9._%+'-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,24}$/.test(data.email)) { err.textContent = t("bad_email"); return; }
+    if (!data.human) { err.textContent = t("humanWait"); return; }
+    btn.disabled = true; btn.textContent = t("registering");
+    try {
+      const r = await callScript(data);
+      if (!r.ok) throw new Error(r.error);
+      showCheckEmail(data.email, r.demoLink);
+    } catch (e2) {
+      const known = Object.prototype.hasOwnProperty.call(TEXT[state.lang], e2.message);
+      err.textContent = known ? TEXT[state.lang][e2.message] : t("regFail");
+      btn.disabled = false; btn.textContent = t("register");
+      resetHumanCheck(); // each check can only be used once
+    }
+  };
+}
+
+function showResend() {
+  app.innerHTML = page({
+    title: t("resendTitle"),
+    lede: t("resendIntro"),
+    body: `
+      <form id="rs" novalidate>
+        <label class="field" for="email">${t("email")}</label>
+        <input class="input" type="text" id="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="100">
+        <div id="human" class="human"></div>
+        <div class="actions"><p class="error" id="err"></p><button class="btn" type="submit" id="go">${t("resendBtn")}</button></div>
+      </form>
+      <p class="small soft" style="margin-top:18px"><a href="#" id="toReg">${t("backToReg")}</a></p>`
+  });
+  const form = app.querySelector("#rs");
+  const err = app.querySelector("#err");
+  const btn = app.querySelector("#go");
+  form.oninput = () => err.textContent = "";
+  app.querySelector("#toReg").onclick = (e) => { e.preventDefault(); showRegister(); };
+  renderHumanCheck("resend");
+  form.onsubmit = async (e) => {
+    e.preventDefault();
+    const email = app.querySelector("#email").value.trim();
+    if (!/^[A-Za-z0-9._%+'-]{1,64}@[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,24}$/.test(email)) { err.textContent = t("bad_email"); return; }
+    if (!humanToken) { err.textContent = t("humanWait"); return; }
+    btn.disabled = true; btn.textContent = t("registering");
+    try {
+      const r = await callScript({ action: "resend", email: email, language: state.lang, human: humanToken });
+      if (!r.ok) throw new Error(r.error);
+      showResendSent(email, r.demoLink);
+    } catch (e2) {
+      const known = Object.prototype.hasOwnProperty.call(TEXT[state.lang], e2.message);
+      err.textContent = known ? TEXT[state.lang][e2.message] : t("resendFail");
+      btn.disabled = false; btn.textContent = t("resendBtn");
+      resetHumanCheck();
+    }
+  };
+}
+
+function demoButton(link) {
+  return link ? `<a class="btn" href="${esc(link)}" style="text-decoration:none;margin-top:8px">${t("demoOpen")}</a>` : "";
+}
+
+function showResendSent(email, demoLink) {
+  app.innerHTML = page({
+    title: t("resendSentTitle"),
+    lede: t("resendSentMsg", { e: "<strong>" + esc(email) + "</strong>" }),
+    body: `<p class="soft">${t("resendSentNote").replace(/(here|aquí)\./, '<a href="#" id="toReg">$1</a>.')}</p>${demoButton(demoLink)}`
+  });
+  app.querySelector("#toReg").onclick = (e) => { e.preventDefault(); showRegister(); };
+}
+
+function showCheckEmail(email, demoLink) {
+  app.innerHTML = page({
+    title: t("checkTitle"),
+    lede: t("checkMsg", { e: "<strong>" + esc(email) + "</strong>" }),
+    body: `<p class="soft">${t("checkNote")}</p>${demoButton(demoLink)}`
+  });
+}
+
+/* Screen: personal link */
+async function showWelcome() {
+  app.innerHTML = page({ title: t("loadingTitle"), body: `<p class="soft" role="status">${t("loading")}</p>` });
+  try {
+    const r = await callScript({ action: "lookup", token: TOKEN, language: state.lang });
+    if (!r.ok || !r.statuses) return showBadLink();
+    if (!Array.isArray(r.sessions) || !r.sessions.length) return showBadLink();
+    state.first = r.firstName; state.last = r.lastName; state.statuses = r.statuses;
+    state.sessions = r.sessions; state.passPercent = r.passPercent || 100;
+  } catch (e) {
+    app.innerHTML = page({ title: t("loadingTitle"), body: `<p class="error">${t("sendErr")}</p>`, actions: `<button class="btn" id="retry">${t("retry")}</button>` });
+    app.querySelector("#retry").onclick = showWelcome;
+    return;
+  }
+  // Pick up at the first session not yet passed.
+  const next = state.sessions.findIndex(x => !state.statuses[x.id].passed);
+  if (next === -1) { setSession(state.sessions.length - 1); return showComplete(); }
+  setSession(next);
+  if (isLocked()) return showLocked();
+  showStart();
+}
+
+/* Shared layout: header band (course, progress, title), open content, pinned actions. */
+function page({ step, title, lede, body = "", actions = "", course }) {
+  return `${DEMO && state.lang ? `<p class="demo">${t("demoNote")}</p>` : ""}
+    <header class="band"><div class="in">
+      <p class="course">${course || (state.statuses ? t("sessionTitle") : t("title"))}</p>
+      ${step ? stepper(step) : ""}
+      <h1>${title}</h1>
+      ${lede ? `<p class="lede">${lede}</p>` : ""}
+    </div></header>
+    <div class="wrap"><div class="in">${body}</div></div>
+    ${actions ? `<div class="actions"><div class="in">${actions}</div></div>` : ""}`;
+}
+
+/* Progress tracker: current step is highlighted, finished steps turn green. */
+function stepper(current) {
+  const steps = [
+    { key: "start", label: t("stepStart"), done: state.started, open: true, go: showStart },
+    { key: "video", label: t("stepVideo"), done: state.done, open: state.started, go: showVideo },
+    { key: "quiz", label: t("stepQuiz"), done: state.passed, open: state.done && !isLocked(), go: () => showQuiz() }
+  ];
+  stepperActions = steps;
+  return `<ol class="steps" aria-label="Progress">${steps.map((s, i) => {
+    const cls = ["stp", s.done ? "done" : "", s.key === current ? "current" : "", !s.open ? "locked" : ""].join(" ").trim();
+    const status = s.done ? t("stepDone") : s.key === current ? t("stepCurrent") : !s.open ? t("stepLocked") : "";
+    const icon = s.done ? "&#10003;" : String(i + 1);
+    const clickable = s.open && s.key !== current;
+    const tag = clickable ? "button" : "div";
+    return `<li><${tag} class="${cls}${clickable ? " clickable" : ""}" data-step="${i}" ${s.key === current ? 'aria-current="step"' : ""}>
+      <span class="dot" aria-hidden="true">${icon}</span><span>${s.label}</span>
+      <span class="sr-only">${status}</span></${tag}></li>`;
+  }).join("")}</ol>`;
+}
+let stepperActions = [];
+let activeVideo = null;
+// Fully stop the video when leaving its screen, so it can't keep playing in the background.
+function stopVideo() {
+  if (!activeVideo) return;
+  const v = activeVideo; activeVideo = null;
+  v.pause(); v.removeAttribute("src"); v.load();
+}
+function bindStepper() {
+  app.querySelectorAll("button.stp[data-step]").forEach(b => b.onclick = () => {
+    const s = stepperActions[Number(b.dataset.step)];
+    if (s && s.open) s.go();
+  });
+}
+
+/* Step 1: start */
+function showStart() {
+  stopVideo();
+  document.onvisibilitychange = null;
+  app.innerHTML = page({
+    step: "start",
+    title: t(state.idx > 0 ? "welcomeBack" : "welcome", { n: esc(state.first) }),
+    body: `
+      ${state.idx > 0 ? `<p class="small soft">${t("progress")}</p>` : ""}
+      <p>${t("welcomeMsg")}</p>
+      <p class="small soft"><a href="${esc(location.pathname)}">${t("notYou")}</a></p>`,
+    actions: `<button class="btn" id="go">${t(state.idx > 0 ? "beginSession" : "begin")}</button>`
+  });
+  bindStepper();
+  app.querySelector("#go").onclick = () => {
+    state.started = true; saveProgress();
+    state.done ? showQuiz() : showVideo();
+  };
+}
+
+/* The video link is requested only when the learner opens the video step. */
+async function getVideoUrl(force) {
+  const fresh = state.videoUrl && (Date.now() - state.videoUrlAt) < (state.videoTtl - 600) * 1000;
+  if (fresh && !force) return state.videoUrl;
+  const r = await callScript({ action: "video", token: TOKEN, language: state.lang, courseId: sess().id });
+  if (!r.ok && r.error === "bad_link") { showBadLink(); return null; }
+  if (!r.ok) throw new Error(r.error || "video");
+  state.videoUrl = r.videoUrl; state.videoUrlAt = Date.now(); state.videoTtl = r.expiresInSeconds || 3600;
+  if (!state.captionsSrc) {
+    if (typeof r.captions === "string" && /^\uFEFF?WEBVTT/.test(r.captions)) state.captionsSrc = URL.createObjectURL(new Blob([r.captions], { type: "text/vtt" }));
+    else if (DEMO && r.captionsUrl) state.captionsSrc = r.captionsUrl;
+  }
+  return state.videoUrl;
+}
+
+function showBadLink() {
+  app.innerHTML = page({
+    title: t("badLinkTitle"),
+    body: `<p>${t("badLinkMsg")}</p>`,
+    actions: `<button class="btn" id="again">${t("registerAgain")}</button>`
+  });
+  app.querySelector("#again").onclick = () => { history.replaceState(null, "", location.pathname); showResend(); };
+}
+
+/* Step 2: video with no controls and no skipping */
+async function showVideo() {
+  stopVideo();
+  app.innerHTML = page({
+    step: "video",
+    title: t("watchTitle"),
+    body: `<div class="loading" role="status">${t("loadingVideo")}</div>`
+  });
+  bindStepper();
+  let url;
+  try {
+    url = await getVideoUrl();
+    if (!url) return;
+  } catch (e) {
+    app.querySelector(".loading").outerHTML = `<p class="error">${t("videoErr")}</p><button class="btn" id="retry">${t("retry")}</button>`;
+    app.querySelector("#retry").onclick = showVideo;
+    return;
+  }
+  app.innerHTML = page({
+    step: "video",
+    title: t("watchTitle"),
+    body: `
+      <div class="video-wrap">
+        <video id="vid" playsinline webkit-playsinline preload="auto"
+          disablepictureinpicture disableremoteplayback
+          controlslist="nodownload nofullscreen noremoteplayback noplaybackrate"
+          oncontextmenu="return false;"></video>
+        <div class="shield" aria-hidden="true"></div>
+      </div>
+      <div class="bar" aria-hidden="true"><div class="fill" id="fill"></div></div>
+      <div class="row"><span id="watched"></span><button class="cc" id="ccBtn" type="button" aria-pressed="true" hidden>${t("captions")}</button><span id="left"></span></div>
+      <p class="small soft">${t("watchNote")}</p>`,
+    actions: `
+      <p class="error" id="msg"></p>
+      <button class="btn" id="playBtn">${t("play")}</button>
+      <button class="btn" id="quizBtn" hidden>${t("toQuiz")}</button>`
+  });
+
+  const v = app.querySelector("#vid");
+  const fill = app.querySelector("#fill");
+  const msg = app.querySelector("#msg");
+  const playBtn = app.querySelector("#playBtn");
+  const quizBtn = app.querySelector("#quizBtn");
+
+  bindStepper();
+  activeVideo = v;
+  v.src = url;
+  v.controls = false;
+
+  // Captions, when the session has them. On by default; the choice is remembered on this device.
+  if (state.captionsSrc) {
+    const tr = document.createElement("track");
+    tr.kind = "captions"; tr.srclang = state.lang; tr.label = t("captions"); tr.src = state.captionsSrc; tr.default = true;
+    v.appendChild(tr);
+    const ccBtn = app.querySelector("#ccBtn");
+    let on = true;
+    try { on = localStorage.getItem("rl:cc") !== "off"; } catch (e) {}
+    const apply = () => {
+      ccBtn.setAttribute("aria-pressed", on ? "true" : "false");
+      if (v.textTracks[0]) v.textTracks[0].mode = on ? "showing" : "hidden";
+    };
+    tr.addEventListener("load", apply);
+    ccBtn.hidden = false;
+    ccBtn.onclick = () => { on = !on; try { localStorage.setItem("rl:cc", on ? "on" : "off"); } catch (e) {} apply(); };
+    apply();
+  }
+
+  const update = () => {
+    if (!v.duration || activeVideo !== v) return;
+    fill.style.width = Math.min(100, (state.maxWatched / v.duration) * 100) + "%";
+    app.querySelector("#watched").textContent = fmt(state.maxWatched) + " " + t("watched");
+    app.querySelector("#left").textContent = fmt(v.duration - state.maxWatched) + " " + t("left");
+  };
+
+  v.addEventListener("loadedmetadata", () => {
+    if (state.done) v.currentTime = 0;
+    else if (state.maxWatched > 0) v.currentTime = Math.min(state.maxWatched, v.duration);
+    update();
+  });
+  let retried = false;
+  v.addEventListener("error", async () => {
+    if (activeVideo !== v) return;
+    if (retried) { msg.textContent = t("videoErr"); return; }
+    retried = true;
+    try {
+      const fresh = await getVideoUrl(true);
+      if (fresh && activeVideo === v) { v.src = fresh; v.load(); }
+    } catch (e) { msg.textContent = t("videoErr"); }
+  });
+
+  // Track the furthest point reached during normal playback.
+  v.addEventListener("timeupdate", () => {
+    if (!v.seeking && v.currentTime > state.maxWatched && v.currentTime - state.maxWatched < 1.5) {
+      state.maxWatched = v.currentTime;
+      if (Math.floor(v.currentTime) % 5 === 0) saveProgress();
+    }
+    update();
+  });
+
+  // Block any jump forward past what has been watched.
+  v.addEventListener("seeking", () => {
+    if (v.currentTime > state.maxWatched + 0.5) v.currentTime = state.maxWatched;
+  });
+
+  // Block speed changes.
+  v.addEventListener("ratechange", () => { if (v.playbackRate !== 1) v.playbackRate = 1; });
+
+  v.addEventListener("play", () => {
+    if (!state.videoStarted) { state.videoStarted = new Date().toISOString(); saveProgress(); }
+    playBtn.textContent = t("pause");
+    msg.textContent = "";
+  });
+  v.addEventListener("pause", () => { if (v.ended) return; playBtn.textContent = t("resume"); if (!state.done) saveProgress(); });
+
+  v.addEventListener("ended", () => {
+    if (state.maxWatched < v.duration - 2) { v.currentTime = state.maxWatched; return; }
+    state.maxWatched = v.duration;
+    state.done = true;
+    state.videoFinished = new Date().toISOString();
+    saveProgress();
+    update();
+    playBtn.hidden = true;
+    quizBtn.hidden = false;
+    quizBtn.classList.remove("quiet");
+    const live = app.querySelector(".steps");
+    if (live) { live.outerHTML = stepper("video"); bindStepper(); }
+  });
+
+  playBtn.onclick = () => { v.paused ? v.play().catch(() => msg.textContent = t("videoErr")) : v.pause(); };
+  quizBtn.onclick = () => showQuiz();
+
+  // Pause if the learner switches tabs or apps.
+  document.onvisibilitychange = () => {
+    if (document.hidden && !v.paused && !state.done) { v.pause(); msg.textContent = t("leftPage"); }
+  };
+  // Block keyboard shortcuts on the video.
+  v.addEventListener("keydown", e => e.preventDefault());
+
+  if (state.done) { quizBtn.hidden = false; quizBtn.classList.add("quiet"); quizBtn.style.marginTop = "12px"; }
+}
+
+/* Screen: quiz */
+function showQuiz(errText) {
+  stopVideo();
+  document.onvisibilitychange = null;
+  const qs = sess().questions;
+  app.innerHTML = page({
+    step: "quiz",
+    title: t("quizTitle"),
+    lede: state.status && state.status.remaining === 1 ? t("quizLast") : t("quizNote"),
+    body: `
+      <form id="quiz" novalidate>
+        ${qs.map((item, i) => `
+          <fieldset class="q">
+            <legend><span class="num">${t("qOf", { i: i + 1, n: qs.length })}</span>${esc(item.q)}</legend>
+            ${item.a.map((opt, j) => `
+              <label class="opt"><input type="radio" name="q${i}" value="${j}"><span>${esc(opt)}</span></label>`).join("")}
+          </fieldset>`).join("")}
+        <div class="actions"><p class="error" id="err">${errText ? esc(errText) : ""}</p><button class="btn" type="submit" id="submit">${t("submit")}</button></div>
+      </form>`
+  });
+  bindStepper();
+  const form = app.querySelector("#quiz");
+  const err = app.querySelector("#err");
+  form.onchange = () => err.textContent = "";
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const answers = [];
+    for (let i = 0; i < qs.length; i++) {
+      const c = form.querySelector(`input[name="q${i}"]:checked`);
+      if (!c) { err.textContent = t("quizErr"); return; }
+      answers.push(Number(c.value));
+    }
+    submitQuiz(answers);
+  };
+}
+
+/* Send to Google and show result */
+async function submitQuiz(answers) {
+  state.lastAnswers = answers;
+  const btn = app.querySelector("#submit");
+  btn.disabled = true; btn.textContent = t("sending");
+  const qs = sess().questions;
+  const payload = {
+    action: "submit",
+    token: TOKEN,
+    courseId: sess().id,
+    courseVersion: sess().version,
+    language: state.lang,
+    videoStarted: state.videoStarted,
+    videoFinished: state.videoFinished,
+    answers: answers,
+    answerText: answers.map((a, i) => qs[i].a[a])
+  };
+  try {
+    const data = await callScript(payload);
+    if (!data.ok && data.error === "bad_link") return showBadLink();
+    if (data.status) state.status = data.status;
+    if (!data.ok && data.error === "no_attempts") return showLocked();
+    if (!data.ok && (data.error === "already_passed" || data.error === "locked")) return showWelcome();
+    if (!data.ok) throw new Error(data.error || "save failed");
+    showResult(data);
+  } catch (e) {
+    showSendError();
+  }
+}
+
+function showSendError() {
+  app.innerHTML = page({
+    step: "quiz",
+    title: t("sendErrTitle"),
+    body: `<p>${t("sendErr")}</p>`,
+    actions: `<button class="btn" id="retry">${t("retry")}</button>`
+  });
+  bindStepper();
+  app.querySelector("#retry").onclick = () => submitQuiz(state.lastAnswers);
+}
+
+function showResult(r) {
+  const pass = r.passed;
+  const out = !pass && isLocked();
+  const last = state.idx === state.sessions.length - 1;
+  if (pass) {
+    state.passed = true; saveProgress();
+    state.statuses[sess().id] = Object.assign({}, state.status, { passed: true });
+    if (!last) state.statuses[state.sessions[state.idx + 1].id].unlocked = true;
+  }
+  // After a failed attempt, the video must be watched in full again before the next try.
+  if (!pass) { state.done = false; state.maxWatched = 0; state.videoStarted = ""; state.videoFinished = ""; saveProgress(); }
+  const badge = pass
+    ? `<svg viewBox="0 0 40 40" aria-hidden="true"><path class="tick" d="M10 21l7 7 13-15"/></svg>`
+    : `<svg viewBox="0 0 40 40" aria-hidden="true"><path d="M20 11v12M20 29v.5" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round"/></svg>`;
+  app.innerHTML = page({
+    step: "quiz",
+    title: pass ? t("passTitle") : out ? t("lockedTitle") : t("failTitle"),
+    body: `
+      <div class="result ${pass ? "pass" : "fail"}">
+        <div class="badge">${badge}</div>
+        <div>
+          <div class="big">${Math.round(r.percent)}%</div>
+          <div class="who">${esc(state.first)} ${esc(state.last)}, ${t("attempt").toLowerCase()} ${r.attempt}</div>
+        </div>
+      </div>
+      <p class="${pass ? "done-note" : ""}">${pass ? t(last ? "passFinal" : "passMsg") : out ? t("lockedMsg") : t("failMsg")}</p>`,
+    actions: pass ? (last ? "" : `<button class="btn" id="nextBtn">${t("nextSession")}</button>`)
+      : out ? "" : `<button class="btn" id="review">${t("review")}</button>`
+  });
+  bindStepper();
+  if (pass && !last) app.querySelector("#nextBtn").onclick = () => { setSession(state.idx + 1); window.scrollTo(0, 0); showStart(); };
+  if (!pass && !out) app.querySelector("#review").onclick = () => showVideo();
+}
+
+/* Out of attempts (shown when they come back to their link) */
+function showLocked() {
+  stopVideo();
+  document.onvisibilitychange = null;
+  state.started = true;
+  app.innerHTML = page({
+    step: "quiz",
+    title: t("lockedTitle"),
+    body: `<p>${t("lockedMsg")}</p>`
+  });
+  bindStepper();
+}
+
+/* Already passed (shown when they come back to their link) */
+function showComplete() {
+  stopVideo();
+  document.onvisibilitychange = null;
+  state.started = true; state.done = true; state.passed = true;
+  app.innerHTML = page({
+    step: "quiz",
+    course: t("title"),
+    title: t("completeTitle"),
+    body: `
+      <div class="result pass">
+        <div class="badge"><svg viewBox="0 0 40 40" aria-hidden="true"><path class="tick" d="M10 21l7 7 13-15"/></svg></div>
+        <div class="who" style="margin:0;font-size:20px;color:var(--ink)">${esc(state.first)} ${esc(state.last)}</div>
+      </div>
+      <p class="done-note">${t("completeMsg")}</p>`
+  });
+  bindStepper();
+}
+
+// Discourage copying: block right-click, dragging, and common inspect/save shortcuts.
+// This stops casual attempts only. The expiring video links are the real protection.
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
+document.addEventListener("keydown", e => {
+  const k = (e.key || "").toLowerCase();
+  const mod = e.ctrlKey || e.metaKey;
+  if (k === "f12" ||
+      (mod && e.shiftKey && ["i", "j", "c"].includes(k)) ||
+      (e.metaKey && e.altKey && ["i", "j", "c", "u"].includes(k)) ||
+      (mod && ["u", "s"].includes(k))) {
+    e.preventDefault();
+  }
+});
+
+document.documentElement.style.setProperty("--brand", CONFIG.BRAND_COLOR);
+document.documentElement.style.setProperty("--accent", CONFIG.ACCENT_COLOR);
+if (CONFIG.HEADER_STYLE === "brand") document.documentElement.setAttribute("data-header", "brand");
+
+// Demo mode loads a stand-in for the Google script, with the sample sessions.
+if (DEMO) {
+  const d = document.createElement("script");
+  d.src = "demo.js";
+  d.onload = showLanguage;
+  d.onerror = () => { app.innerHTML = '<p style="padding:24px">Add your SCRIPT_URL to the settings at the top of index.html.</p>'; };
+  document.head.appendChild(d);
+} else {
+  showLanguage();
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "name": "readyline-training",
+  "version": "1.0.0",
+  "description": "ReadyLine by Makersridge: free video training, quizzes, and proof of completion for small teams.",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "test": "node tests/server.test.js && node tests/tools.test.js",
+    "quiz": "node tools/quiz-to-settings.js templates/sessions.csv templates/questions.csv",
+    "test:browser": "node tests/browser.test.js",
+    "build:demo": "node tools/build-demo.js",
+    "zip": "node tools/make-site-zip.js"
+  },
+  "devDependencies": {
+    "playwright": "^1.47.0"
+  }
+}

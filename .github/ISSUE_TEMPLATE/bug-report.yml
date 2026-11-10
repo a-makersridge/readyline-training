@@ -1,0 +1,36 @@
+name: Bug report
+description: Something works differently than the docs say
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "**Never post your R2 keys, your Turnstile Secret Key, your access code, or anyone's personal link.**"
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you expected, what happened instead, and the exact error text.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: "1. Open the training page on a phone\n2. Register with...\n3. ..."
+    validations:
+      required: true
+  - type: input
+    id: device
+    attributes:
+      label: Device and browser
+      placeholder: iPhone 15, Safari / Windows 11, Chrome
+  - type: textarea
+    id: log
+    attributes:
+      label: Apps Script log
+      description: From the Executions page (clock icon), with any keys removed.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: ReadyLine version

@@ -1,0 +1,43 @@
+name: Setup help
+description: Stuck on a step of the setup guide
+labels: ["setup help"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying ReadyLine. Before you post, try the AI helper prompt at the end of your step in docs/SETUP.md, and the Troubleshooting table in docs/ADMIN-GUIDE.md.
+        **Never post your R2 keys, your Turnstile Secret Key, your access code, or anyone's personal link.**
+  - type: dropdown
+    id: step
+    attributes:
+      label: Which setup step?
+      options:
+        - 1. Prepare your videos
+        - 2. Cloudflare R2
+        - 3. Cloudflare Turnstile
+        - 4. Google Sheet and script
+        - 5. Publish the script
+        - 6. Connect the page
+        - 7. Cloudflare Pages
+        - 8. Testing
+        - After launch
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What did you do, and what happened?
+      description: Paste any error message exactly as it appears.
+    validations:
+      required: true
+  - type: textarea
+    id: log
+    attributes:
+      label: Apps Script log
+      description: From the Executions page (clock icon) or the log after running setup or testVideoLinks. Remove any keys.
+      render: text
+  - type: input
+    id: version
+    attributes:
+      label: ReadyLine version
+      description: Shown in the setup log, for example 1.0.0
