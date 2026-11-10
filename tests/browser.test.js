@@ -86,11 +86,13 @@ const register = async (pg, email) => {
     await pg.click('text=Abrir mi enlace de capacitación (demostración)');
     await pg.click('text=Español'); await pg.waitForSelector('#go');
     for (const id of ['session-1', 'session-2', 'session-3']) {
-      await pg.click('#go'); await watch(pg);
+      await pg.click('#go');
+      await pg.waitForSelector('#demoSkip'); await pg.click('#demoSkip');
+      await pg.waitForSelector('#quizBtn:not([hidden])'); await pg.click('#quizBtn'); await pg.waitForSelector('#quiz');
       await answer(pg, KEY(id)); await pg.waitForSelector('.result.pass');
       if (id !== 'session-3') { await pg.click('#nextBtn'); await pg.waitForSelector('#go'); }
     }
-    ok('Demo: all 3 sessions pass in Spanish', (await pg.innerText('.wrap')).includes('Completó las 3 sesiones'));
+ok('Demo: Skip the video lets you flip through all 3 sessions', (await pg.innerText('.wrap')).includes('Completó las 3 sesiones'));
     ok('Demo: no page errors', errors.length === 0, errors.join(' | '));
     await ctx.close();
   }
@@ -110,6 +112,8 @@ const register = async (pg, email) => {
     await pg.goto(link); await pg.click('text=English'); await pg.waitForSelector('#go');
     ok('Header: Session 1 of 3', (await pg.innerText('.course')) === 'Sample Company Training, Session 1 of 3', await pg.innerText('.course'));
     await pg.click('#go');
+    await pg.waitForSelector('#vid');
+    ok('No skip button in live mode', !(await pg.$('#demoSkip')));
     await pg.waitForFunction(() => { const v = document.querySelector('#vid'); return v && v.textTracks[0] && v.textTracks[0].cues && v.textTracks[0].cues.length > 0; });
     ok('Live mode: captions from the script show on the video', await pg.evaluate(() => document.querySelector('#vid track').src.startsWith('blob:')));
     await watch(pg);

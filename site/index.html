@@ -189,6 +189,7 @@ const TEXT = {
     first: "First name", last: "Last name", email: "Email", code: "Access code",
     codeHint: "{o} gave you this code.",
     demoCodeHint: "Demo: any access code works, and any name and email. Nothing is sent.",
+    demoSkip: "Skip the video (demo only)",
     register: "Send my link", registering: "Sending…",
     regErr: "Fill in every field to continue.",
     bad_code: "That access code isn't right. Check with {o} and try again.",
@@ -267,6 +268,7 @@ const TEXT = {
     first: "Nombre", last: "Apellido", email: "Correo electrónico", code: "Código de acceso",
     codeHint: "{o} le dio este código.",
     demoCodeHint: "Demostración: cualquier código de acceso funciona, igual que cualquier nombre y correo. No se envía nada.",
+    demoSkip: "Saltar el video (solo en la demostración)",
     register: "Enviar mi enlace", registering: "Enviando…",
     regErr: "Llene todos los campos para continuar.",
     bad_code: "Ese código de acceso no es correcto. Consulte con {o} e inténtelo de nuevo.",
@@ -711,7 +713,8 @@ async function showVideo() {
     actions: `
       <p class="error" id="msg"></p>
       <button class="btn" id="playBtn">${t("play")}</button>
-      <button class="btn" id="quizBtn" hidden>${t("toQuiz")}</button>`
+      <button class="btn" id="quizBtn" hidden>${t("toQuiz")}</button>
+      ${DEMO && !state.done ? `<button class="btn quiet" id="demoSkip">${t("demoSkip")}</button>` : ""}`
   });
 
   const v = app.querySelector("#vid");
@@ -790,9 +793,8 @@ async function showVideo() {
   });
   v.addEventListener("pause", () => { if (v.ended) return; playBtn.textContent = t("resume"); if (!state.done) saveProgress(); });
 
-  v.addEventListener("ended", () => {
-    if (state.maxWatched < v.duration - 2) { v.currentTime = state.maxWatched; return; }
-    state.maxWatched = v.duration;
+  const finishVideo = () => {
+    state.maxWatched = v.duration || state.maxWatched;
     state.done = true;
     state.videoFinished = new Date().toISOString();
     saveProgress();
@@ -802,7 +804,21 @@ async function showVideo() {
     quizBtn.classList.remove("quiet");
     const live = app.querySelector(".steps");
     if (live) { live.outerHTML = stepper("video"); bindStepper(); }
+    const skip = app.querySelector("#demoSkip");
+    if (skip) skip.remove();
+  };
+  v.addEventListener("ended", () => {
+    if (state.maxWatched < v.duration - 2) { v.currentTime = state.maxWatched; return; }
+    finishVideo();
   });
+
+  // Demo mode only: let visitors skip ahead so they can see every screen.
+  const demoSkip = app.querySelector("#demoSkip");
+  if (demoSkip) demoSkip.onclick = () => {
+    if (!state.videoStarted) state.videoStarted = new Date().toISOString();
+    v.pause();
+    finishVideo();
+  };
 
   playBtn.onclick = () => { v.paused ? v.play().catch(() => msg.textContent = t("videoErr")) : v.pause(); };
   quizBtn.onclick = () => showQuiz();
