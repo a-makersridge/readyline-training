@@ -2,6 +2,8 @@
 
 **Free video training, quizzes, and proof of completion for small teams. No per-person fees.**
 
+**[Try the demo](https://a-makersridge.github.io/readyline-training/site/)** on your phone or computer. It runs with sample sessions, and nothing is saved or emailed.
+
 ReadyLine turns your training videos into a guided course. People register, watch each video without skipping, pass a quiz, and move on to the next session. Every result lands in a Google Sheet you own, with one row per person and a full record of every attempt.
 
 It was built for teams that bring on a lot of people and can't pay per seat for a learning platform: staffing agencies, warehouses, light industrial and hospitality employers, franchises, and any small business with recurring onboarding.
@@ -71,7 +73,7 @@ You'll also need your **videos** as MP4 files ([how to make them](docs/MAKING-VI
 
 ## Try it first
 
-Open `site/index.html` with the settings untouched and it runs in **demo mode**: the sample sessions, sample videos, and quizzes all work in your browser, with nothing saved or emailed. To try it locally, start a simple web server in this folder (for example `npx serve .`) and open `/site/`.
+The [live demo](https://a-makersridge.github.io/readyline-training/site/) shows the whole learner experience. You can also open `site/index.html` with the settings untouched and it runs in **demo mode**: the sample sessions, sample videos, and quizzes all work in your browser, with nothing saved or emailed. To try it locally, start a simple web server in this folder (for example `npx serve .`) and open `/site/`.
 
 ## Setting it up
 
