@@ -18,7 +18,7 @@ First public release of ReadyLine by Makersridge.
 - ReadyLine menu in the Sheet: Look up a person (status, results, and their personal link to copy) and Refresh summary
 - Quiz spreadsheet templates and tools/quiz-to-settings.js
 - Demo mode with sample sessions, videos, and captions, live at https://a-makersridge.github.io/readyline-training/site/
-  - Any access code, name, and email work (the code comes filled in), and nothing is saved or emailed
+  - The sign-up form comes filled in with a sample name, email, and code, and nothing is saved or emailed
   - A "Skip the video" button so visitors can flip through every screen. It appears only in demo mode.
 
 **Docs**

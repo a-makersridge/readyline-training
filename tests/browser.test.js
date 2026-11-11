@@ -62,6 +62,7 @@ const register = async (pg, email) => {
     await pg.click('text=English');
     ok('Demo banner is shown', (await pg.innerText('.demo')).includes('Demo mode'));
     ok('Header uses the sample training name', (await pg.innerText('.course')).includes('Sample Company Training'));
+    ok('Demo form comes filled in, so no real email is needed', (await pg.inputValue('#email')) === 'demo@example.com' && (await pg.inputValue('#first')) === 'Alex' && (await pg.inputValue('#code')) === 'DEMO');
     await register(pg, 'demo@example.com');
     await pg.waitForSelector('text=Open my training link (demo)');
     await pg.click('text=Open my training link (demo)');
@@ -82,7 +83,7 @@ const register = async (pg, email) => {
   {
     const { ctx, pg, errors } = await newPage(browser);
     await pg.goto('http://test.local/site/index.html'); await pg.click('text=Español');
-    await register(pg, 'demo2@example.com');
+    await pg.waitForTimeout(150); await pg.click('#go');
     await pg.click('text=Abrir mi enlace de capacitación (demostración)');
     await pg.click('text=Español'); await pg.waitForSelector('#go');
     for (const id of ['session-1', 'session-2', 'session-3']) {
