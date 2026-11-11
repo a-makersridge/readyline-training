@@ -2,7 +2,7 @@
 
 **Free video training, quizzes, and proof of completion for small teams. No per-person fees.**
 
-**[Try the demo](https://a-makersridge.github.io/readyline-training/site/)** on your phone or computer. The sign-up form comes filled in with sample details, so just tap **Send my link**, then **Open my training link (demo)**. It runs with sample sessions, and nothing is saved or emailed. The demo adds a **Skip the video** button so you can flip through every screen in a few minutes; your live training never shows it.
+**[Try the demo](https://a-makersridge.github.io/readyline-training/site/)** on your phone or computer. The sign-up form comes filled in (any email works, like test@gmail.com), so just tap **Send my link**, then **Open my training link (demo)**. It runs with sample sessions, and nothing is saved or emailed. The demo adds a **Skip the video** button so you can flip through every screen in a few minutes; your live training never shows it.
 
 ReadyLine turns your training videos into a guided course. People register, watch each video without skipping, pass a quiz, and move on to the next session. Every result lands in a Google Sheet you own, with one row per person and a full record of every attempt.
 

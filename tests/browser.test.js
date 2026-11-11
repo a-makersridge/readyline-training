@@ -62,7 +62,7 @@ const register = async (pg, email) => {
     await pg.click('text=English');
     ok('Demo banner is shown', (await pg.innerText('.demo')).includes('Demo mode'));
     ok('Header uses the sample training name', (await pg.innerText('.course')).includes('Sample Company Training'));
-    ok('Demo form comes filled in, so no real email is needed', (await pg.inputValue('#email')) === 'demo@example.com' && (await pg.inputValue('#first')) === 'Alex' && (await pg.inputValue('#code')) === 'DEMO');
+    ok('Demo form comes filled in, so no real email is needed', (await pg.inputValue('#email')) === 'test@gmail.com' && (await pg.inputValue('#first')) === 'Alex' && (await pg.inputValue('#code')) === 'DEMO');
     await register(pg, 'demo@example.com');
     await pg.waitForSelector('text=Open my training link (demo)');
     await pg.click('text=Open my training link (demo)');

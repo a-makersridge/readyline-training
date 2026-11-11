@@ -188,7 +188,7 @@ const TEXT = {
     regIntro: "Register to get your personal training link. We'll email it to you.",
     first: "First name", last: "Last name", email: "Email", code: "Access code",
     codeHint: "{o} gave you this code.",
-    demoCodeHint: "Demo: everything is filled in with sample details. Tap the button below. Nothing is saved or emailed.",
+    demoCodeHint: "Demo: everything is filled in for you. Any email works, like test@gmail.com, because nothing is saved or emailed. Tap the button below.",
     demoSkip: "Skip the video (demo only)",
     register: "Send my link", registering: "Sending…",
     regErr: "Fill in every field to continue.",
@@ -267,7 +267,7 @@ const TEXT = {
     regIntro: "Regístrese para recibir su enlace personal de capacitación. Se lo enviaremos por correo electrónico.",
     first: "Nombre", last: "Apellido", email: "Correo electrónico", code: "Código de acceso",
     codeHint: "{o} le dio este código.",
-    demoCodeHint: "Demostración: todo está lleno con datos de muestra. Toque el botón de abajo. No se guarda ni se envía nada.",
+    demoCodeHint: "Demostración: todo está lleno por usted. Cualquier correo funciona, como test@gmail.com, porque no se guarda ni se envía nada. Toque el botón de abajo.",
     demoSkip: "Saltar el video (solo en la demostración)",
     register: "Enviar mi enlace", registering: "Enviando…",
     regErr: "Llene todos los campos para continuar.",
@@ -468,7 +468,7 @@ function showRegister() {
         <label class="field" for="last">${t("last")}</label>
         <input class="input" type="text" id="last" autocomplete="family-name" maxlength="40"${DEMO ? ' value="Rivera"' : ""}>
         <label class="field" for="email">${t("email")}</label>
-        <input class="input" type="text" id="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="100"${DEMO ? ' value="demo@example.com"' : ""}>
+        <input class="input" type="text" id="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="100"${DEMO ? ' value="test@gmail.com"' : ""}>
         <label class="field" for="code">${t("code")}</label>
         <input class="input" type="text" id="code" autocapitalize="characters" autocomplete="off" maxlength="40"${DEMO ? ' value="DEMO"' : ""}>
         <p class="hint">${DEMO ? t("demoCodeHint") : t("codeHint")}</p>
@@ -513,7 +513,7 @@ function showResend() {
     body: `
       <form id="rs" novalidate>
         <label class="field" for="email">${t("email")}</label>
-        <input class="input" type="text" id="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="100"${DEMO ? ' value="demo@example.com"' : ""}>
+        <input class="input" type="text" id="email" inputmode="email" autocomplete="email" autocapitalize="off" spellcheck="false" maxlength="100"${DEMO ? ' value="test@gmail.com"' : ""}>
         <div id="human" class="human"></div>
         <div class="actions"><p class="error" id="err"></p><button class="btn" type="submit" id="go">${t("resendBtn")}</button></div>
       </form>
